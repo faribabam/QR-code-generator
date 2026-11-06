@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Pro Max — استودیوی حرفه‌ای</title>
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<style>
+:root{--bg:#eef2f7;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+--p1:#6366f1;--p2:#8b5cf6;--danger:#ef4444;--ok:#10b981;--r:16px;
+--shadow:0 8px 28px rgba(15,23,42,.08)}
+[data-theme="dark"]{--bg:#0b1220;--card:#111a2e;--text:#e2e8f0;--muted:#94a3b8;
+--border:#1e293b;--p1:#818cf8;--p2:#a78bfa;--shadow:0 8px 28px rgba(0,0,0,.4)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif}
+body{min-height:100vh;background:var(--bg);color:var(--text);transition:.3s;padding:16px;
+background-image:radial-gradient(circle at 10% 10%,rgba(99,102,241,.1),transparent 40%),
+radial-gradient(circle at 90% 90%,rgba(139,92,246,.1),transparent 40%)}
+.app{max-width:1200px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+h1{font-size:1.5rem;background:linear-gradient(135deg,var(--p1),var(--p2));
+-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.sub{color:var(--muted);font-size:.8rem;margin-top:2px}
+.hdr-actions{display:flex;gap:8px}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);
+background:var(--card);color:var(--text);font-size:1rem;cursor:pointer;
+transition:.2s;display:grid;place-items:center}
+.icon-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+main{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:1000px){main{grid-template-columns:1.5fr 1fr;align-items:start}}
+.panel{background:var(--card);border-radius:var(--r);padding:18px;
+box-shadow:var(--shadow);border:1px solid var(--border);transition:.3s}
+.panel h2{font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+/* Type tabs */
+.type-tabs{display:grid;grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:6px;margin-bottom:14px}
+.type-tab{padding:8px 4px;border:2px solid var(--border);border-radius:12px;background:var(--card);
+color:var(--text);font-size:.72rem;font-weight:600;cursor:pointer;transition:.15s;
+display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.type-tab span:first-child{font-size:1.1rem}
+.type-tab:hover{border-color:var(--p1);transform:translateY(-1px)}
+.type-tab.active{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border-color:transparent;
+box-shadow:0 4px 12px rgba(99,102,241,.35)}
+/* Form */
+.type-form{display:none;flex-direction:column;gap:10px;margin-bottom:12px}
+.type-form.active{display:flex}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:.78rem;color:var(--muted);font-weight:500}
+.field input[type="text"],.field input[type="url"],.field input[type="email"],
+.field input[type="tel"],.field input[type="number"],.field input[type="password"],
+.field textarea,.field select{padding:10px 12px;border:2px solid var(--border);border-radius:10px;
+background:var(--bg);color:var(--text);font-size:.9rem;outline:none;transition:.2s;
+font-family:inherit;direction:ltr;text-align:left}
+.field textarea{min-height:70px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--p1);
+box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.grid-2{grid-template-columns:1fr}}
+/* Row */
+.row{display:flex;gap:8px}
+.row .field{flex:1}
+/* Buttons */
+.btn{padding:11px 18px;border:none;border-radius:11px;font-size:.88rem;font-weight:600;
+cursor:pointer;transition:.15s;color:#fff;background:linear-gradient(135deg,var(--p1),var(--p2));
+display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(99,102,241,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn.ghost:hover{background:var(--bg)}
+.btn.ok{background:linear-gradient(135deg,#10b981,#059669)}
+.btn.danger{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.btn.sm{padding:6px 12px;font-size:.78rem;border-radius:8px}
+/* Preview */
+.preview{margin-top:12px;border-radius:14px;padding:20px;min-height:300px;
+display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,#f8fafc,#eef2f7);overflow:hidden;transition:.3s}
+[data-theme="dark"] .preview{background:linear-gradient(135deg,#0b1220,#111a2e)}
+.preview.transparent{background-image:linear-gradient(45deg,#cbd5e1 25%,transparent 25%),
+linear-gradient(-45deg,#cbd5e1 25%,transparent 25%),
+linear-gradient(45deg,transparent 75%,#cbd5e1 75%),
+linear-gradient(-45deg,transparent 75%,#cbd5e1 75%);
+background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+.preview canvas{max-width:100%;max-height:340px;height:auto;border-radius:8px;
+box-shadow:0 10px 28px rgba(0,0,0,.15);animation:pop .35s}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.ph{color:var(--muted);font-size:.85rem;text-align:center;line-height:1.8}
+.ph .big{font-size:2.4rem;display:block;margin-bottom:6px;opacity:.6}
+.spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--p1);
+border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* Actions */
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px;margin-top:12px}
+.actions.hidden{display:none}
+/* Settings sections */
+details{border:1px solid var(--border);border-radius:12px;margin:10px 0;background:var(--bg);overflow:hidden}
+details summary{padding:12px 14px;cursor:pointer;font-weight:600;font-size:.85rem;
+list-style:none;user-select:none;display:flex;justify-content:space-between;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"▾";transition:transform .2s;color:var(--muted)}
+details[open] summary::after{transform:rotate(180deg)}
+.detail-body{padding:12px;border-top:1px solid var(--border);display:grid;gap:10px}
+/* Style chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 10px;border:2px solid var(--border);border-radius:99px;background:var(--card);
+color:var(--text);font-size:.75rem;cursor:pointer;transition:.15s;font-weight:500}
+.chip:hover{border-color:var(--p1)}
+.chip.active{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border-color:transparent}
+/* Color input */
+.color-input{display:flex;align-items:center;gap:8px}
+.color-input input[type="color"]{width:38px;height:38px;border:2px solid var(--border);
+border-radius:10px;cursor:pointer;padding:2px;background:transparent}
+/* Toggle */
+.toggle{display:flex;align-items:center;gap:8px;font-size:.82rem;cursor:pointer;user-select:none}
+.toggle input{appearance:none;width:34px;height:18px;background:var(--border);border-radius:99px;
+position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.toggle input:checked{background:var(--p1)}
+.toggle input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;
+border-radius:50%;background:#fff;transition:.2s}
+.toggle input:checked::after{transform:translateX(16px)}
+/* Range */
+input[type="range"]{width:100%;accent-color:var(--p1);cursor:pointer}
+/* Upload */
+.upload{border:2px dashed var(--border);border-radius:10px;padding:12px;text-align:center;
+font-size:.8rem;color:var(--muted);cursor:pointer;transition:.2s}
+.upload:hover{border-color:var(--p1);color:var(--p1)}
+.upload input{display:none}
+.logo-preview{display:flex;align-items:center;gap:8px;margin-top:6px}
+.logo-preview img{width:32px;height:32px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
+/* History */
+.history-list{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
+.h-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;
+background:var(--bg);border:1px solid var(--border);cursor:pointer;transition:.15s}
+.h-item:hover{border-color:var(--p1);transform:translateX(-2px)}
+.h-item canvas,.h-item img{width:36px;height:36px;border-radius:6px;background:#fff;flex-shrink:0}
+.h-item .info{flex:1;min-width:0}
+.h-item .t{font-size:.72rem;direction:ltr;text-align:left;white-space:nowrap;
+overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.h-item .m{font-size:.65rem;color:var(--muted);margin-top:2px}
+.empty{text-align:center;color:var(--muted);font-size:.8rem;padding:16px 0}
+/* Presets */
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px}
+.preset{padding:8px 4px;border:2px solid var(--border);border-radius:10px;cursor:pointer;
+font-size:.65rem;font-weight:600;text-align:center;transition:.15s;background:var(--card)}
+.preset:hover{transform:translateY(-2px);border-color:var(--p1)}
+.preset .sw{height:22px;border-radius:6px;margin-bottom:4px}
+/* Scanner */
+.scan-wrap{display:none;margin-top:10px;border-radius:12px;overflow:hidden;background:#000;position:relative}
+.scan-wrap.active{display:block}
+.scan-wrap video,.scan-wrap img{width:100%;display:block;max-height:300px;object-fit:cover}
+.scan-result{margin-top:10px;padding:10px;background:var(--bg);border-radius:10px;
+font-size:.82rem;direction:ltr;text-align:left;word-break:break-all}
+/* Toast */
+.toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;
+flex-direction:column;gap:8px;z-index:99999;pointer-events:none}
+.toast{padding:10px 18px;border-radius:11px;color:#fff;font-weight:600;font-size:.85rem;
+background:linear-gradient(135deg,var(--p1),var(--p2));box-shadow:0 8px 24px rgba(0,0,0,.25);
+animation:su .3s;pointer-events:auto;max-width:90vw}
+.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.toast.ok{background:linear-gradient(135deg,#10b981,#059669)}
+@keyframes su{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+/* Warning */
+.warn{padding:8px 10px;border-radius:8px;background:#fef3c7;color:#92400e;
+font-size:.75rem;font-weight:500;display:none;align-items:center;gap:6px;margin-top:6px}
+[data-theme="dark"] .warn{background:#78350f;color:#fde68a}
+.warn.show{display:flex}
+/* Kbd */
+kbd{padding:2px 6px;border-radius:5px;background:var(--bg);border:1px solid var(--border);
+font-size:.7rem;font-family:monospace}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>QR Pro Max 🚀</h1>
+      <div class="sub">استودیوی کامل ساخت QR — ۱۰ نوع داده، استایل حرفه‌ای، اسکنر داخلی</div>
+    </div>
+    <div class="hdr-actions">
+      <button class="icon-btn" id="theme-btn" title="تغییر تم">🌙</button>
+      <button class="icon-btn" id="shortcuts-btn" title="کلیدهای میانبر">⌨️</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <!-- Tabs -->
+      <div class="type-tabs" id="type-tabs">
+        <button class="type-tab active" data-type="url"><span>🌐</span>وب‌سایت</button>
+        <button class="type-tab" data-type="text"><span>📝</span>متن</button>
+        <button class="type-tab" data-type="wifi"><span>📶</span>وای‌فای</button>
+        <button class="type-tab" data-type="vcard"><span>👤</span>مخاطب</button>
+        <button class="type-tab" data-type="email"><span>✉️</span>ایمیل</button>
+        <button class="type-tab" data-type="sms"><span>💬</span>پیامک</button>
+        <button class="type-tab" data-type="phone"><span>📞</span>تلفن</button>
+        <button class="type-tab" data-type="whatsapp"><span>💚</span>واتساپ</button>
+        <button class="type-tab" data-type="telegram"><span>✈️</span>تلگرام</button>
+        <button class="type-tab" data-type="location"><span>📍</span>موقعیت</button>
+      </div>
+
+      <!-- Forms -->
+      <div class="type-form active" data-for="url">
+        <div class="field"><label>آدرس سایت</label>
+          <input type="url" id="f-url" placeholder="https://example.com" autocomplete="off"></div>
+      </div>
+
+      <div class="type-form" data-for="text">
+        <div class="field"><label>متن</label>
+          <textarea id="f-text" placeholder="متن دلخواه..."></textarea></div>
+      </div>
+
+      <div class="type-form" data-for="wifi">
+        <div class="grid-2">
+          <div class="field"><label>نام شبکه (SSID)</label><input type="text" id="f-ssid"></div>
+          <div class="field"><label>رمز عبور</label><input type="text" id="f-wifipass"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>نوع امنیت</label>
+            <select id="f-wifienc"><option value="WPA">WPA/WPA2</option>
+              <option value="WEP">WEP</option><option value="nopass">بدون رمز</option></select></div>
+          <div class="field"><label>&nbsp;</label>
+            <label class="toggle"><input type="checkbox" id="f-hidden"><span>شبکه مخفی</span></label></div>
+        </div>
+      </div>
+
+      <div class="type-form" data-for="vcard">
+        <div class="grid-2">
+          <div class="field"><label>نام کامل</label><input type="text" id="f-vname"></div>
+          <div class="field"><label>سازمان</label><input type="text" id="f-vorg"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>تلفن</label><input type="tel" id="f-vphone"></div>
+          <div class="field"><label>ایمیل</label><input type="email" id="f-vemail"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>وب‌سایت</label><input type="url" id="f-vweb"></div>
+          <div class="field"><label>آدرس</label><input type="text" id="f-vaddr"></div>
+        </div>
+      </div>
+
+      <div class="type-form" data-for="email">
+        <div class="field"><label>ایمیل گیرنده</label><input type="email" id="f-etoo" placeholder="name@example.com"></div>
+        <div class="field"><label>موضوع</label><input type="text" id="f-esub"></div>
+        <div class="field"><label>متن</label><textarea id="f-ebody"></textarea></div>
+      </div>
+
+      <div class="type-form" data-for="sms">
+        <div class="field"><label>شماره</label><input type="tel" id="f-smsnum" placeholder="+98912..."></div>
+        <div class="field"><label>پیام</label><textarea id="f-smsbody"></textarea></div>
+      </div>
+
+      <div class="type-form" data-for="phone">
+        <div class="field"><label>شماره تلفن</label><input type="tel" id="f-phonenum" placeholder="+98912..."></div>
+      </div>
+
+      <div class="type-form" data-for="whatsapp">
+        <div class="grid-2">
+          <div class="field"><label>شماره (با کد کشور)</label><input type="tel" id="f-wanum" placeholder="98912..."></div>
+          <div class="field"><label>پیام پیش‌فرض</label><input type="text" id="f-wamsg"></div>
+        </div>
+      </div>
+
+      <div class="type-form" data-for="telegram">
+        <div class="field"><label>نام کاربری (بدون @)</label><input type="text" id="f-tguser"></div>
+      </div>
+
+      <div class="type-form" data-for="location">
+        <div class="grid-2">
+          <div class="field"><label>عرض جغرافیایی</label><input type="text" id="f-lat" placeholder="35.6892"></div>
+          <div class="field"><label>طول جغرافیایی</label><input type="text" id="f-lng" placeholder="51.389"></div>
+        </div>
+      </div>
+
+      <button class="btn" id="gen-btn" style="width:100%;margin-top:4px">✨ ساخت QR</button>
+      <div class="warn" id="density-warn">⚠️ <span></span></div>
+
+      <!-- Advanced styles -->
+      <details id="style-details">
+        <summary>🎨 استایل حرفه‌ای</summary>
+        <div class="detail-body">
+          <!-- Presets -->
+          <div class="field">
+            <label>تم‌های آماده</label>
+            <div class="presets" id="presets"></div>
+          </div>
+
+          <!-- Dot style -->
+          <div class="field">
+            <label>شکل نقطه‌ها</label>
+            <div class="chips" id="dot-types">
+              <button class="chip active" data-val="square">مربع</button>
+              <button class="chip" data-val="dots">دایره</button>
+              <button class="chip" data-val="rounded">گرد</button>
+              <button class="chip" data-val="classy">کلاسیک</button>
+              <button class="chip" data-val="classy-rounded">کلاسیک گرد</button>
+              <button class="chip" data-val="extra-rounded">بسیار گرد</button>
+            </div>
+          </div>
+
+          <!-- Corners -->
+          <div class="field">
+            <label>گوشه‌ها (قاب)</label>
+            <div class="chips" id="corner-types">
+              <button class="chip active" data-val="square">مربع</button>
+              <button class="chip" data-val="extra-rounded">گرد</button>
+              <button class="chip" data-val="dot">دایره</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>نقطه گوشه‌ها</label>
+            <div class="chips" id="corner-dot-types">
+              <button class="chip active" data-val="square">مربع</button>
+              <button class="chip" data-val="dot">دایره</button>
+            </div>
+          </div>
+
+          <!-- Colors -->
+          <div class="grid-2">
+            <div class="field"><label>رنگ اصلی</label>
+              <div class="color-input"><input type="color" id="color1" value="#1e293b">
+                <input type="text" id="color1-hex" value="#1e293b" style="flex:1;padding:8px;
+                border:2px solid var(--border);border-radius:8px;background:var(--bg);
+                color:var(--text);font-size:.8rem;direction:ltr"></div></div>
+            <div class="field"><label>رنگ دوم</label>
+              <div class="color-input"><input type="color" id="color2" value="#6366f1">
+                <input type="text" id="color2-hex" value="#6366f1" style="flex:1;padding:8px;
+                border:2px solid var(--border);border-radius:8px;background:var(--bg);
+                color:var(--text);font-size:.8rem;direction:ltr"></div></div>
+          </div>
+
+          <div class="grid-2">
+            <label class="toggle"><input type="checkbox" id="grad-on"><span>گرادیانت</span></label>
+            <label class="toggle"><input type="checkbox" id="transparent"><span>پس‌زمینه شفاف</span></label>
+          </div>
+
+          <div class="field"><label>رنگ پس‌زمینه</label>
+            <input type="color" id="bg-color" value="#ffffff" style="width:100%;height:36px;
+            border:2px solid var(--border);border-radius:8px;cursor:pointer;padding:2px"></div>
+
+          <!-- Size / margin -->
+          <div class="grid-2">
+            <div class="field"><label>سایز: <b id="size-val">512</b>px</label>
+              <input type="range" id="size" min="200" max="1200" step="50" value="512"></div>
+            <div class="field"><label>حاشیه: <b id="margin-val">4</b></label>
+              <input type="range" id="margin" min="0" max="12" step="1" value="4"></div>
+          </div>
+
+          <div class="field"><label>سطح تصحیح خطا</label>
+            <select id="ec" style="padding:8px;border:2px solid var(--border);border-radius:8px;
+            background:var(--bg);color:var(--text)">
+              <option value="L">کم (7%)</option><option value="M">متوسط (15%)</option>
+              <option value="Q">بالا (25%)</option><option value="H" selected>خیلی بالا (30%)</option>
+            </select></div>
+
+          <!-- Random -->
+          <button class="btn ghost sm" id="random-colors">🎲 رنگ تصادفی</button>
+        </div>
+      </details>
+
+      <!-- Logo -->
+      <details id="logo-details">
+        <summary>🖼️ لوگو</summary>
+        <div class="detail-body">
+          <label class="upload" for="logo-file">📁 برای انتخاب تصویر کلیک کنید
+            <input type="file" id="logo-file" accept="image/*"></label>
+          <div class="logo-preview" id="logo-preview" hidden>
+            <img id="logo-img" alt="">
+            <button class="btn ghost sm" id="remove-logo">حذف</button>
+          </div>
+          <div class="field"><label>شکل لوگو</label>
+            <div class="chips" id="logo-shapes">
+              <button class="chip active" data-val="square">مربع</button>
+              <button class="chip" data-val="rounded">گرد</button>
+              <button class="chip" data-val="circle">دایره</button>
+            </div>
+          </div>
+          <div class="field"><label>اندازه لوگو: <b id="logo-size-val">40</b>%</label>
+            <input type="range" id="logo-size" min="15" max="55" value="40"></div>
+        </div>
+      </details>
+
+      <!-- Frame -->
+      <details id="frame-details">
+        <summary>🖼️ قاب و برچسب</summary>
+        <div class="detail-body">
+          <div class="field"><label>نوع قاب</label>
+            <div class="chips" id="frame-types">
+              <button class="chip active" data-val="none">بدون قاب</button>
+              <button class="chip" data-val="simple">قاب ساده</button>
+              <button class="chip" data-val="scan-me">SCAN ME</button>
+              <button class="chip" data-val="top-label">برچسب بالا</button>
+              <button class="chip" data-val="bottom-label">برچسب پایین</button>
+              <button class="chip" data-val="rounded">قاب گرد</button>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>متن برچسب</label><input type="text" id="frame-text" value="SCAN ME"></div>
+            <div class="field"><label>رنگ پس‌زمینه قاب</label>
+              <input type="color" id="frame-bg" value="#ffffff" style="width:100%;height:36px;
+              border:2px solid var(--border);border-radius:8px;cursor:pointer;padding:2px"></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>رنگ برچسب</label>
+              <input type="color" id="label-bg" value="#6366f1" style="width:100%;height:36px;
+              border:2px solid var(--border);border-radius:8px;cursor:pointer;padding:2px"></div>
+            <div class="field"><label>رنگ متن برچسب</label>
+              <input type="color" id="label-color" value="#ffffff" style="width:100%;height:36px;
+              border:2px solid var(--border);border-radius:8px;cursor:pointer;padding:2px"></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Preview -->
+      <div class="preview" id="preview">
+        <div class="ph"><span class="big">📱</span>اطلاعات را پر کنید و <b>ساخت QR</b> را بزنید</div>
+      </div>
+
+      <div class="actions hidden" id="actions">
+        <button class="btn" data-act="png">⬇️ PNG</button>
+        <button class="btn" data-act="jpeg">⬇️ JPEG</button>
+        <button class="btn" data-act="svg">⬇️ SVG</button>
+        <button class="btn" data-act="webp">⬇️ WebP</button>
+        <button class="btn ghost" data-act="copy">📋 کپی</button>
+        <button class="btn ghost" data-act="share">🔗 اشتراک</button>
+        <button class="btn ghost" data-act="print">🖨️ چاپ</button>
+        <button class="btn danger" data-act="reset">🔄 پاک</button>
+      </div>
+    </section>
+
+    <!-- Sidebar -->
+    <aside style="display:flex;flex-direction:column;gap:16px">
+      <!-- Scanner -->
+      <section class="panel">
+        <h2>📷 اسکنر QR</h2>
+        <div class="row">
+          <button class="btn ghost sm" id="upload-scan" style="flex:1">📁 از فایل</button>
+          <button class="btn ghost sm" id="camera-scan" style="flex:1">📷 دوربین</button>
+          <input type="file" id="scan-file" accept="image/*" style="display:none">
+        </div>
+        <div class="scan-wrap" id="scan-wrap">
+          <video id="scan-video" playsinline></video>
+          <img id="scan-img" style="display:none">
+        </div>
+        <div class="scan-result" id="scan-result" style="display:none"></div>
+      </section>
+
+      <!-- History -->
+      <section class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h2 style="margin:0">🕘 تاریخچه</h2>
+          <button class="btn ghost sm" id="clear-history">پاک کردن</button>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="empty">هنوز QR ساخته نشده است</div>
+        </div>
+      </section>
+
+      <!-- Settings export -->
+      <section class="panel">
+        <h2>⚙️ تنظیمات</h2>
+        <div class="row">
+          <button class="btn ghost sm" id="export-settings" style="flex:1">📤 خروجی تنظیمات</button>
+          <button class="btn ghost sm" id="import-settings" style="flex:1">📥 ورود تنظیمات</button>
+          <input type="file" id="import-file" accept=".json" style="display:none">
+        </div>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const state = {
+  qrType: 'url',
+  dotType: 'square',
+  cornerType: 'square',
+  cornerDotType: 'square',
+  logoShape: 'square',
+  logoData: null,
+  logoImage: null,
+  frameType: 'none',
+  finalCanvas: null,
+  qrInstance: null,
+  history: [],
+  scanning: false,
+  stream: null
+};
+
+const LS = {
+  theme: 'qrProMax_theme',
+  history: 'qrProMax_history',
+  settings: 'qrProMax_settings'
+};
+
+/* ---------- Utils ---------- */
+function toast(msg, type='') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  $('toasts').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; }, 2200);
+  setTimeout(() => el.remove(), 2600);
+}
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+  ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+}
+function sanitize(u) { return (u||'qr').replace(/[^a-z0-9]/gi, '_').slice(0,40); }
+
+/* ---------- Theme ---------- */
+function initTheme() {
+  const saved = localStorage.getItem(LS.theme);
+  const t = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  setTheme(t);
+}
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $('theme-btn').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem(LS.theme, t);
+}
+
+/* ---------- Build QR data ---------- */
+function buildData() {
+  const v = id => ($(id)?.value || '').trim();
+  const t = state.qrType;
+  if (t === 'url') {
+    let u = v('f-url');
+    if (!u) return '';
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    return u;
+  }
+  if (t === 'text') return v('f-text');
+  if (t === 'wifi') {
+    const ssid = v('f-ssid');
+    if (!ssid) return '';
+    const enc = v('f-wifienc') || 'WPA';
+    const pass = v('f-wifipass');
+    const hidden = $('f-hidden').checked ? 'H:true;' : '';
+    return `WIFI:T:${enc};S:${ssid};P:${pass};${hidden};`;
+  }
+  if (t === 'vcard') {
+    const name = v('f-vname');
+    if (!name) return '';
+    return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nORG:${v('f-vorg')}\nTEL:${v('f-vphone')}\nEMAIL:${v('f-vemail')}\nURL:${v('f-vweb')}\nADR:${v('f-vaddr')}\nEND:VCARD`;
+  }
+  if (t === 'email') {
+    const to = v('f-etoo');
+    if (!to) return '';
+    const p = new URLSearchParams();
+    if (v('f-esub')) p.set('subject', v('f-esub'));
+    if (v('f-ebody')) p.set('body', v('f-ebody'));
+    return `mailto:${to}${p.toString() ? '?' + p : ''}`;
+  }
+  if (t === 'sms') {
+    const n = v('f-smsnum');
+    if (!n) return '';
+    return `SMSTO:${n}:${v('f-smsbody')}`;
+  }
+  if (t === 'phone') return v('f-phonenum') ? `tel:${v('f-phonenum')}` : '';
+  if (t === 'whatsapp') {
+    const n = v('f-wanum').replace(/\D/g, '');
+    if (!n) return '';
+    const m = v('f-wamsg');
+    return `https://wa.me/${n}${m ? '?text=' + encodeURIComponent(m) : ''}`;
+  }
+  if (t === 'telegram') {
+    const u = v('f-tguser').replace(/^@/, '');
+    return u ? `https://t.me/${u}` : '';
+  }
+  if (t === 'location') {
+    const la = v('f-lat'), ln = v('f-lng');
+    return la && ln ? `geo:${la},${ln}` : '';
+  }
+  return '';
+}
+
+/* ---------- Render QR ---------- */
+const renderQR = debounce(async () => {
+  const data = buildData();
+  if (!data) {
+    $('preview').innerHTML = '<div class="ph"><span class="big">📱</span>اطلاعات را کامل کنید</div>';
+    $('actions').classList.add('hidden');
+    return;
+  }
+
+  // density warning
+  const warnEl = $('density-warn');
+  if (data.length > 300) {
+    warnEl.classList.add('show');
+    warnEl.querySelector('span').textContent = `داده طولانی است (${data.length} کاراکتر) — اسکن ممکن است سخت‌تر شود`;
+  } else warnEl.classList.remove('show');
+
+  const preview = $('preview');
+  preview.innerHTML = '<div class="spin"></div>';
+
+  const opts = readStyleOptions();
+  try {
+    const qr = new QRCodeStyling({
+      width: opts.size, height: opts.size, type: 'canvas', data,
+      margin: opts.margin, image: state.logoData || undefined,
+      qrOptions: { errorCorrectionLevel: opts.ec },
+      imageOptions: { hideBackgroundDots: true, imageSize: opts.logoSize/100, margin: 4, crossOrigin: 'anonymous' },
+      dotsOptions: {
+        color: opts.color1,
+        type: opts.dotType,
+        gradient: opts.gradient ? {
+          type: 'linear', rotation: Math.PI/4,
+          colorStops: [{ offset: 0, color: opts.color1 }, { offset: 1, color: opts.color2 }]
+        } : undefined
+      },
+      backgroundOptions: { color: opts.transparent ? 'transparent' : opts.bg },
+      cornersSquareOptions: { color: opts.color1, type: opts.cornerType },
+      cornersDotOptions: { color: opts.color1, type: opts.cornerDotType }
+    });
+    state.qrInstance = qr;
+
+    const blob = await qr.getRawData('png');
+    const img = new Image();
+    img.src = URL.createObjectURL(blob);
+    await img.decode();
+    const qrCanvas = document.createElement('canvas');
+    qrCanvas.width = img.width;
+    qrCanvas.height = img.height;
+    qrCanvas.getContext('2d').drawImage(img, 0, 0);
+    URL.revokeObjectURL(img.src);
+
+    const final = drawFrame(qrCanvas, opts);
+    state.finalCanvas = final;
+
+    preview.classList.toggle('transparent', opts.transparent && opts.frameType === 'none');
+    preview.innerHTML = '';
+    const shown = document.createElement('canvas');
+    shown.width = final.width;
+    shown.height = final.height;
+    shown.getContext('2d').drawImage(final, 0, 0);
+    preview.appendChild(shown);
+    $('actions').classList.remove('hidden');
+  } catch (e) {
+    console.error(e);
+    preview.innerHTML = '<div class="ph" style="color:var(--danger)">خطا در ساخت QR</div>';
+  }
+}, 250);
+
+function readStyleOptions() {
+  return {
+    size: +$('size').value,
+    margin: +$('margin').value,
+    ec: $('ec').value,
+    color1: $('color1').value,
+    color2: $('color2').value,
+    bg: $('bg-color').value,
+    gradient: $('grad-on').checked,
+    transparent: $('transparent').checked,
+    dotType: state.dotType,
+    cornerType: state.cornerType,
+    cornerDotType: state.cornerDotType,
+    logoSize: +$('logo-size').value,
+    frameType: state.frameType,
+    frameText: $('frame-text').value,
+    frameBg: $('frame-bg').value,
+    labelBg: $('label-bg').value,
+    labelColor: $('label-color').value
+  };
+}
+
+/* ---------- Frame drawing ---------- */
+function drawFrame(qrCanvas, o) {
+  if (o.frameType === 'none') return qrCanvas;
+  const pad = Math.round(qrCanvas.width * 0.04);
+  const labelH = Math.round(qrCanvas.width * 0.13);
+  const isBottom = ['scan-me','bottom-label','simple'].includes(o.frameType);
+  const hasTop = o.frameType === 'top-label';
+  const hasLabel = isBottom && o.frameType !== 'simple';
+
+  let w = qrCanvas.width + pad * 2;
+  let h = qrCanvas.height + pad * 2 + (hasLabel ? labelH : 0) + (hasTop ? labelH : 0);
+
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+
+  // frame background
+  if (o.frameType === 'rounded') {
+    roundRect(ctx, 0, 0, w, h, 24);
+    ctx.fillStyle = o.frameBg;
+    ctx.fill();
+  } else {
+    ctx.fillStyle = o.frameBg;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  // QR
+  const qx = pad;
+  const qy = pad + (hasTop ? labelH : 0);
+  ctx.drawImage(qrCanvas, qx, qy);
+
+  // label
+  if (hasLabel || hasTop) {
+    const lblY = hasTop ? 0 : h - labelH;
+    ctx.fillStyle = o.labelBg;
+    ctx.fillRect(0, lblY, w, labelH);
+    ctx.fillStyle = o.labelColor;
+    ctx.font = `bold ${Math.round(labelH * 0.5)}px 'Segoe UI', Tahoma, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const text = o.frameType === 'scan-me' ? 'SCAN ME' : (o.frameText || 'SCAN ME');
+    ctx.fillText(text, w / 2, lblY + labelH / 2);
+  }
+
+  return c;
+}
+
+/* ---------- Downloads ---------- */
+function dlURL(url, name) {
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function download(kind) {
+  if (!state.finalCanvas) return;
+  const c = state.finalCanvas;
+  const name = `qr-${sanitize(buildData())}`;
+  if (kind === 'png') {
+    dlURL(c.toDataURL('image/png'), name + '.png');
+    toast('PNG دانلود شد ✅', 'ok');
+  } else if (kind === 'jpeg' || kind === 'webp') {
+    const white = document.createElement('canvas');
+    white.width = c.width; white.height = c.height;
+    const cx = white.getContext('2d');
+    cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, c.width, c.height);
+    cx.drawImage(c, 0, 0);
+    const mime = kind === 'jpeg' ? 'image/jpeg' : 'image/webp';
+    const q = kind === 'jpeg' ? 0.95 : 0.92;
+    dlURL(white.toDataURL(mime, q), name + '.' + (kind === 'jpeg' ? 'jpg' : 'webp'));
+    toast(kind.toUpperCase() + ' دانلود شد ✅', 'ok');
+  } else if (kind === 'svg') {
+    // PNG inside SVG wrapper (preserves frame)
+    const png = c.toDataURL('image/png');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${c.width}" height="${c.height}" viewBox="0 0 ${c.width} ${c.height}"><image href="${png}" width="${c.width}" height="${c.height}"/></svg>`;
+    dlURL('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg), name + '.svg');
+    toast('SVG دانلود شد ✅', 'ok');
+  }
+}
+
+/* ---------- Copy / Share / Print ---------- */
+async function copyQR() {
+  if (!state.finalCanvas) return;
+  try {
+    const blob = await new Promise(r => state.finalCanvas.toBlob(r, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    toast('QR کپی شد ✅', 'ok');
+  } catch { toast('مرورگر پشتیبانی نمی‌کند', 'error'); }
+}
+async function shareQR() {
+  if (!state.finalCanvas) return;
+  try {
+    const blob = await new Promise(r => state.finalCanvas.toBlob(r, 'image/png'));
+    const file = new File([blob], 'qr.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'QR Code', text: buildData() });
+    } else toast('مرورگر پشتیبانی نمی‌کند', 'error');
+  } catch {}
+}
+function printQR() {
+  if (!state.finalCanvas) return;
+  const w = window.open('');
+  w.document.write(`<html><head><title>QR</title><style>body{margin:0;display:grid;place-items:center;min-height:100vh}</style></head><body><img src="${state.finalCanvas.toDataURL('image/png')}" onload="window.print();window.close()" style="max-width:90vw"></body></html>`);
+}
+
+/* ---------- Confetti ---------- */
+function confetti() {
+  const c = document.createElement('canvas');
+  c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:99999';
+  c.width = innerWidth; c.height = innerHeight;
+  document.body.appendChild(c);
+  const ctx = c.getContext('2d');
+  const colors = ['#6366f1','#8b5cf6','#10b981','#f59e0b','#ef4444','#ec4899','#06b6d4'];
+  const parts = [];
+  for (let i = 0; i < 90; i++) {
+    parts.push({
+      x: innerWidth/2, y: innerHeight/2,
+      vx: (Math.random()-.5)*22, vy: (Math.random()-.5)*22 - 6,
+      sz: Math.random()*9+3,
+      col: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*Math.PI*2, vr: (Math.random()-.5)*0.4, life: 1
+    });
+  }
+  let f = 0;
+  (function loop() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.rot += p.vr; p.life -= 0.012;
+      if (p.life > 0) {
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.col; ctx.fillRect(-p.sz/2, -p.sz/2, p.sz, p.sz); ctx.restore();
+      }
+    });
+    if (++f < 130) requestAnimationFrame(loop); else c.remove();
+  })();
+}
+
+/* ---------- Logo ---------- */
+async function processLogo(file, shape) {
+  const img = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i); i.onerror = rej;
+    i.src = URL.createObjectURL(file);
+  });
+  const size = 300;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  if (shape === 'circle') {
+    ctx.beginPath(); ctx.arc(size/2, size/2, size/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
+  } else if (shape === 'rounded') {
+    roundRect(ctx, 0, 0, size, size, 60); ctx.clip();
+  }
+  // fit image (cover)
+  const s = Math.max(size / img.width, size / img.height);
+  const dw = img.width * s, dh = img.height * s;
+  ctx.drawImage(img, (size-dw)/2, (size-dh)/2, dw, dh);
+  URL.revokeObjectURL(img.src);
+  return c.toDataURL('image/png');
+}
+
+/* ---------- Presets ---------- */
+const PRESETS = [
+  { name: 'کلاسیک', c1:'#1e293b', c2:'#1e293b', bg:'#ffffff', grad:false, dots:'square', corner:'square' },
+  { name: 'اقیانوس', c1:'#0ea5e9', c2:'#06b6d4', bg:'#ffffff', grad:true,  dots:'rounded', corner:'extra-rounded' },
+  { name: 'غروب',   c1:'#f97316', c2:'#ec4899', bg:'#ffffff', grad:true,  dots:'dots', corner:'extra-rounded' },
+  { name: 'نئون',   c1:'#22d3ee', c2:'#a855f7', bg:'#0f172a', grad:true,  dots:'classy-rounded', corner:'dot' },
+  { name: 'جنگل',   c1:'#10b981', c2:'#059669', bg:'#ecfdf5', grad:true,  dots:'extra-rounded', corner:'extra-rounded' },
+  { name: 'سایبر',  c1:'#a855f7', c2:'#ec4899', bg:'#1e1b4b', grad:true,  dots:'classy', corner:'dot' },
+  { name: 'تک‌رنگ', c1:'#000000', c2:'#000000', bg:'#ffffff', grad:false, dots:'square', corner:'square' },
+  { name: 'طلایی',  c1:'#d97706', c2:'#fbbf24', bg:'#fffbeb', grad:true,  dots:'classy-rounded', corner:'extra-rounded' }
+];
+
+function applyPreset(p) {
+  $('color1').value = p.c1; $('color1-hex').value = p.c1;
+  $('color2').value = p.c2; $('color2-hex').value = p.c2;
+  $('bg-color').value = p.bg;
+  $('grad-on').checked = p.grad;
+  state.dotType = p.dots;
+  state.cornerType = p.corner;
+  document.querySelectorAll('#dot-types .chip').forEach(c => c.classList.toggle('active', c.dataset.val === p.dots));
+  document.querySelectorAll('#corner-types .chip').forEach(c => c.classList.toggle('active', c.dataset.val === p.corner));
+  renderQR();
+}
+
+/* ---------- History ---------- */
+function loadHistory() {
+  try { state.history = JSON.parse(localStorage.getItem(LS.history)) || []; }
+  catch { state.history = []; }
+  renderHistory();
+}
+function saveHistory() { try { localStorage.setItem(LS.history, JSON.stringify(state.history)); } catch {} }
+function addHistory() {
+  const data = buildData();
+  if (!data) return;
+  state.history = state.history.filter(h => h.data !== data);
+  state.history.unshift({
+    type: state.qrType, data, ts: Date.now(),
+    thumb: state.finalCanvas.toDataURL('image/png'),
+    snapshot: { ...readStyleOptions(), logo: state.logoData }
+  });
+  state.history = state.history.slice(0, 20);
+  saveHistory(); renderHistory();
+}
+function renderHistory() {
+  const list = $('history-list');
+  if (!state.history.length) {
+    list.innerHTML = '<div class="empty">هنوز QR ساخته نشده است</div>';
+    return;
+  }
+  list.innerHTML = state.history.map((h, i) => `
+    <div class="h-item" data-i="${i}">
+      <img src="${h.thumb}" alt="">
+      <div class="info">
+        <div class="t">${h.data.replace(/</g,'&lt;').slice(0,50)}</div>
+        <div class="m">${new Date(h.ts).toLocaleString('fa-IR')}</div>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('.h-item').forEach(el => {
+    el.onclick = () => restoreFromHistory(+el.dataset.i);
+  });
+}
+function restoreFromHistory(i) {
+  const h = state.history[i];
+  if (!h) return;
+  state.qrType = h.type;
+  document.querySelectorAll('.type-tab').forEach(t => t.classList.toggle('active', t.dataset.type === h.type));
+  document.querySelectorAll('.type-form').forEach(f => f.classList.toggle('active', f.dataset.for === h.type));
+  // restore settings
+  const s = h.snapshot;
+  $('size').value = s.size; $('size-val').textContent = s.size;
+  $('margin').value = s.margin; $('margin-val').textContent = s.margin;
+  $('ec').value = s.ec;
+  $('color1').value = s.color1; $('color1-hex').value = s.color1;
+  $('color2').value = s.color2; $('color2-hex').value = s.color2;
+  $('bg-color').value = s.bg;
+  $('grad-on').checked = s.gradient;
+  $('transparent').checked = s.transparent;
+  state.dotType = s.dotType; state.cornerType = s.cornerType;
+  state.cornerDotType = s.cornerDotType;
+  state.frameType = s.frameType;
+  $('frame-text').value = s.frameText;
+  $('frame-bg').value = s.frameBg;
+  $('label-bg').value = s.labelBg;
+  $('label-color').value = s.labelColor;
+  $('logo-size').value = s.logoSize; $('logo-size-val').textContent = s.logoSize;
+  state.logoData = s.logo || null;
+  if (state.logoData) {
+    $('logo-preview').hidden = false;
+    $('logo-img').src = state.logoData;
+  }
+  updateAllChips();
+  // fill URL if URL type
+  if (h.type === 'url') $('f-url').value = h.data;
+  else if (h.type === 'text') $('f-text').value = h.data;
+  renderQR();
+  toast('بازیابی شد', 'ok');
+}
+
+function updateAllChips() {
+  document.querySelectorAll('#dot-types .chip').forEach(c => c.classList.toggle('active', c.dataset.val === state.dotType));
+  document.querySelectorAll('#corner-types .chip').forEach(c => c.classList.toggle('active', c.dataset.val === state.cornerType));
+  document.querySelectorAll('#corner-dot-types .chip').forEach(c => c.classList.toggle('active', c.dataset.val === state.cornerDotType));
+  document.querySelectorAll('#frame-types .chip').forEach(c => c.classList.toggle('active', c.dataset.val === state.frameType));
+  document.querySelectorAll('#logo-shapes .chip').forEach(c => c.classList.toggle('active', c.dataset.val === state.logoShape));
+}
+
+/* ---------- Scanner ---------- */
+function handleScan(result) {
+  $('scan-result').style.display = 'block';
+  $('scan-result').innerHTML = `✅ پیدا شد:<br><b>${result.replace(/</g,'&lt;')}</b><br>
+    <button class="btn sm" style="margin-top:8px" onclick="useScanned('${result.replace(/'/g,"\\'")}')">استفاده از این</button>`;
+  toast('QR اسکن شد ✅', 'ok');
+}
+function useScanned(text) {
+  if (/^https?:\/\//i.test(text)) {
+    state.qrType = 'url';
+    $('f-url').value = text;
+  } else {
+    state.qrType = 'text';
+    $('f-text').value = text;
+  }
+  document.querySelectorAll('.type-tab').forEach(t => t.classList.toggle('active', t.dataset.type === state.qrType));
+  document.querySelectorAll('.type-form').forEach(f => f.classList.toggle('active', f.dataset.for === state.qrType));
+  renderQR();
+}
+async function scanFile(file) {
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  await img.decode();
+  const c = document.createElement('canvas');
+  c.width = img.width; c.height = img.height;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const d = ctx.getImageData(0, 0, c.width, c.height);
+  const code = jsQR(d.data, c.width, c.height);
+  URL.revokeObjectURL(img.src);
+  if (code) handleScan(code.data);
+  else { toast('QR یافت نشد', 'error'); $('scan-result').style.display = 'none'; }
+}
+async function startCamera() {
+  try {
+    state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const v = $('scan-video');
+    v.srcObject = state.stream;
+    $('scan-img').style.display = 'none';
+    v.style.display = 'block';
+    $('scan-wrap').classList.add('active');
+    await v.play();
+    state.scanning = true;
+    scanLoop();
+  } catch { toast('دسترسی به دوربین ممکن نیست', 'error'); }
+}
+function scanLoop() {
+  if (!state.scanning) return;
+  const v = $('scan-video');
+  if (v.readyState !== v.HAVE_ENOUGH_DATA) { requestAnimationFrame(scanLoop); return; }
+  const c = document.createElement('canvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(v, 0, 0);
+  const d = ctx.getImageData(0, 0, c.width, c.height);
+  const code = jsQR(d.data, c.width, c.height);
+  if (code) { handleScan(code.data); stopCamera(); return; }
+  requestAnimationFrame(scanLoop);
+}
+function stopCamera() {
+  state.scanning = false;
+  if (state.stream) { state.stream.getTracks().forEach(t => t.stop()); state.stream = null; }
+  $('scan-wrap').classList.remove('active');
+}
+
+/* ---------- Settings export/import ---------- */
+function exportSettings() {
+  const s = { ...readStyleOptions(), dotType: state.dotType, cornerType: state.cornerType,
+    cornerDotType: state.cornerDotType, frameType: state.frameType, logo: state.logoData };
+  const blob = new Blob([JSON.stringify(s, null, 2)], { type: 'application/json' });
+  dlURL(URL.createObjectURL(blob), 'qr-settings.json');
+  toast('تنظیمات خروجی شد ✅', 'ok');
+}
+function importSettings(file) {
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const s = JSON.parse(r.result);
+      $('size').value = s.size || 512; $('size-val').textContent = s.size || 512;
+      $('margin').value = s.margin || 4; $('margin-val').textContent = s.margin || 4;
+      $('ec').value = s.ec || 'H';
+      $('color1').value = s.color1 || '#1e293b'; $('color1-hex').value = s.color1 || '#1e293b';
+      $('color2').value = s.color2 || '#6366f1'; $('color2-hex').value = s.color2 || '#6366f1';
+      $('bg-color').value = s.bg || '#ffffff';
+      $('grad-on').checked = !!s.gradient;
+      $('transparent').checked = !!s.transparent;
+      state.dotType = s.dotType || 'square';
+      state.cornerType = s.cornerType || 'square';
+      state.cornerDotType = s.cornerDotType || 'square';
+      state.frameType = s.frameType || 'none';
+      state.logoData = s.logo || null;
+      if (state.logoData) { $('logo-preview').hidden = false; $('logo-img').src = state.logoData; }
+      updateAllChips();
+      renderQR();
+      toast('تنظیمات وارد شد ✅', 'ok');
+    } catch { toast('فایل نامعتبر', 'error'); }
+  };
+  r.readAsText(file);
+}
+
+/* ---------- Bind ---------- */
+// Tabs
+$('type-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.type-tab');
+  if (!btn) return;
+  state.qrType = btn.dataset.type;
+  document.querySelectorAll('.type-tab').forEach(t => t.classList.toggle('active', t === btn));
+  document.querySelectorAll('.type-form').forEach(f => f.classList.toggle('active', f.dataset.for === state.qrType));
+  renderQR();
+});
+
+// All text inputs → live render
+document.querySelectorAll('input, textarea, select').forEach(el => {
+  if (el.type === 'file' || el.type === 'color') return;
+  el.addEventListener('input', renderQR);
+  el.addEventListener('change', renderQR);
+});
+
+// Colors
+['color1', 'color2'].forEach(id => {
+  $(id).addEventListener('input', e => { $(id + '-hex').value = e.target.value; renderQR(); });
+  $(id + '-hex').addEventListener('input', e => {
+    const v = e.target.value;
+    if (/^#[0-9a-f]{6}$/i.test(v)) { $(id).value = v; renderQR(); }
+  });
+});
+$('bg-color').addEventListener('input', renderQR);
+$('grad-on').addEventListener('change', renderQR);
+$('transparent').addEventListener('change', e => { $('bg-color').disabled = e.target.checked; renderQR(); });
+
+// Size/margin
+['size', 'margin'].forEach(id => {
+  $(id).addEventListener('input', () => { $(id + '-val').textContent = $(id).value; renderQR(); });
+});
+$('ec').addEventListener('change', renderQR);
+
+// Dot/corner chips
+$('dot-types').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  state.dotType = c.dataset.val;
+  document.querySelectorAll('#dot-types .chip').forEach(x => x.classList.toggle('active', x === c));
+  renderQR();
+});
+$('corner-types').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  state.cornerType = c.dataset.val;
+  document.querySelectorAll('#corner-types .chip').forEach(x => x.classList.toggle('active', x === c));
+  renderQR();
+});
+$('corner-dot-types').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  state.cornerDotType = c.dataset.val;
+  document.querySelectorAll('#corner-dot-types .chip').forEach(x => x.classList.toggle('active', x === c));
+  renderQR();
+});
+$('frame-types').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  state.frameType = c.dataset.val;
+  document.querySelectorAll('#frame-types .chip').forEach(x => x.classList.toggle('active', x === c));
+  renderQR();
+});
+$('logo-shapes').addEventListener('click', async e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  state.logoShape = c.dataset.val;
+  document.querySelectorAll('#logo-shapes .chip').forEach(x => x.classList.toggle('active', x === c));
+  if (state.logoImage) {
+    state.logoData = await processLogo(state.logoImage, state.logoShape);
+    renderQR();
+  }
+});
+$('frame-text').addEventListener('input', renderQR);
+['frame-bg','label-bg','label-color'].forEach(id => $(id).addEventListener('input', renderQR));
+$('logo-size').addEventListener('input', () => { $('logo-size-val').textContent = $('logo-size').value; renderQR(); });
+
+// Random colors
+$('random-colors').addEventListener('click', () => {
+  const rand = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+  const c1 = rand(), c2 = rand();
+  $('color1').value = c1; $('color1-hex').value = c1;
+  $('color2').value = c2; $('color2-hex').value = c2;
+  $('grad-on').checked = true;
+  renderQR();
+  toast('رنگ تصادفی 🎲', 'ok');
+});
+
+// Presets
+const presetsEl = $('presets');
+PRESETS.forEach(p => {
+  const el = document.createElement('button');
+  el.className = 'preset';
+  el.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,${p.c1},${p.c2})"></div>${p.name}`;
+  el.onclick = () => applyPreset(p);
+  presetsEl.appendChild(el);
+});
+
+// Logo
+$('logo-file').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { toast('فقط تصویر مجاز است', 'error'); return; }
+  if (file.size > 3*1024*1024) { toast('حجم باید کمتر از ۳MB باشد', 'error'); return; }
+  state.logoImage = file;
+  state.logoData = await processLogo(file, state.logoShape);
+  $('logo-img').src = state.logoData;
+  $('logo-preview').hidden = false;
+  $('ec').value = 'H';
+  renderQR();
+  toast('لوگو اضافه شد ✅', 'ok');
+});
+$('remove-logo').addEventListener('click', () => {
+  state.logoData = null; state.logoImage = null;
+  $('logo-preview').hidden = true;
+  $('logo-file').value = '';
+  renderQR();
+});
+
+// Generate
+$('gen-btn').addEventListener('click', () => {
+  const data = buildData();
+  if (!data) { toast('ابتدا اطلاعات را کامل کنید', 'error'); return; }
+  renderQR();
+  setTimeout(() => { if (state.finalCanvas) { confetti(); addHistory(); } }, 400);
+});
+
+// Actions
+$('actions').addEventListener('click', e => {
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if (!act) return;
+  if (act === 'reset') {
+    location.reload();
+  } else if (act === 'copy') copyQR();
+  else if (act === 'share') shareQR();
+  else if (act === 'print') printQR();
+  else download(act);
+});
+
+// Theme
+$('theme-btn').addEventListener('click', () => {
+  setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+});
+
+// Shortcuts
+$('shortcuts-btn').addEventListener('click', () => {
+  toast('Enter=ساخت | Ctrl+D=دانلود PNG | Ctrl+C=کپی', 'ok');
+});
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+    e.preventDefault(); download('png');
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+    e.preventDefault(); copyQR();
+  }
+});
+
+// Scanner
+$('upload-scan').addEventListener('click', () => $('scan-file').click());
+$('scan-file').addEventListener('change', e => {
+  if (e.target.files[0]) scanFile(e.target.files[0]);
+});
+$('camera-scan').addEventListener('click', () => {
+  if (state.stream) { stopCamera(); toast('دوربین خاموش شد'); }
+  else startCamera();
+});
+
+// History
+$('clear-history').addEventListener('click', () => {
+  if (!state.history.length) return;
+  if (confirm('تاریخچه پاک شود؟')) {
+    state.history = []; saveHistory(); renderHistory(); toast('تاریخچه پاک شد');
+  }
+});
+
+// Settings export/import
+$('export-settings').addEventListener('click', exportSettings);
+$('import-settings').addEventListener('click', () => $('import-file').click());
+$('import-file').addEventListener('change', e => {
+  if (e.target.files[0]) importSettings(e.target.files[0]);
+});
+
+/* ---------- Init ---------- */
+initTheme();
+loadHistory();
+setTimeout(() => renderQR(), 300);
+</script>
+</body>
+</html>
