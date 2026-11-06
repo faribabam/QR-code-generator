@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ساخت QR Code برای سایت</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, 'Vazir', sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+    direction: ltr;
+    text-align: left;
+  }
+
+  input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102,126,234,0.15);
+  }
+
+  button {
+    padding: 14px 22px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+  }
+
+  button:active {
+    transform: translateY(0);
+  }
+
+  .error {
+    color: #e53e3e;
+    font-size: 0.85rem;
+    min-height: 20px;
+    margin-bottom: 12px;
+  }
+
+  #qr-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    background: #f7fafc;
+    border-radius: 16px;
+    min-height: 120px;
+    margin: 16px 0;
+  }
+
+  #qr-container canvas,
+  #qr-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    animation: pop 0.4s ease;
+  }
+
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .placeholder {
+    color: #a0aec0;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    display: none;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .actions.show {
+    display: flex;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+
+  .btn-download {
+    background: linear-gradient(135deg, #38a169, #2f855a);
+  }
+
+  .btn-reset {
+    background: linear-gradient(135deg, #a0aec0, #718096);
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>🔗 ساخت QR Code</h1>
+  <p class="subtitle">آدرس سایت خود را وارد کنید تا کد QR آن ساخته شود</p>
+
+  <div class="input-group">
+    <input type="url" id="url-input" placeholder="https://example.com" autocomplete="off">
+    <button onclick="generateQR()">ساخت</button>
+  </div>
+
+  <div class="error" id="error-msg"></div>
+
+  <div id="qr-container">
+    <span class="placeholder">کد QR اینجا نمایش داده می‌شود</span>
+  </div>
+
+  <div class="actions" id="actions">
+    <button class="btn-download" onclick="downloadQR()">⬇️ دانلود</button>
+    <button class="btn-reset" onclick="reset()">🔄 پاک کردن</button>
+  </div>
+</div>
+
+<script>
+  const input      = document.getElementById('url-input');
+  const container  = document.getElementById('qr-container');
+  const errorMsg   = document.getElementById('error-msg');
+  const actions    = document.getElementById('actions');
+  let currentUrl   = '';
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+  }
+
+  function clearError() {
+    errorMsg.textContent = '';
+  }
+
+  function generateQR() {
+    clearError();
+    const url = input.value.trim();
+
+    // بررسی خالی نبودن
+    if (!url) {
+      showError('لطفاً آدرس سایت را وارد کنید.');
+      return;
+    }
+
+    // بررسی شروع با https://
+    if (!url.startsWith('https://')) {
+      showError('آدرس باید با https:// شروع شود.');
+      return;
+    }
+
+    // بررسی اعتبار URL
+    try {
+      new URL(url);
+    } catch {
+      showError('آدرس وارد شده معتبر نیست.');
+      return;
+    }
+
+    currentUrl = url;
+
+    // پاک کردن خروجی قبلی
+    container.innerHTML = '';
+
+    // ساخت QR (سایز بزرگ برای کیفیت بهتر دانلود)
+    new QRCode(container, {
+      text: currentUrl,
+      width: 512,
+      height: 512,
+      colorDark: '#1a202c',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // کوچک کردن نمایش روی صفحه
+    const canvas = container.querySelector('canvas');
+    if (canvas) {
+      canvas.style.width  = '220px';
+      canvas.style.height = '220px';
+    }
+
+    actions.classList.add('show');
+  }
+
+  function downloadQR() {
+    const canvas = container.querySelector('canvas');
+    const img    = container.querySelector('img');
+
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = 'qrcode-' + sanitizeFilename(currentUrl) + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } else if (img) {
+      const link = document.createElement('a');
+      link.download = 'qrcode-' + sanitizeFilename(currentUrl) + '.png';
+      link.href = img.src;
+      link.click();
+    }
+  }
+
+  function sanitizeFilename(str) {
+    return str.replace(/^https?:\/\//, '').replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+  }
+
+  function reset() {
+    input.value = '';
+    container.innerHTML = '<span class="placeholder">کد QR اینجا نمایش داده می‌شود</span>';
+    actions.classList.remove('show');
+    clearError();
+    currentUrl = '';
+    input.focus();
+  }
+
+  // ساخت با کلید Enter
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') generateQR();
+  });
+</script>
+
+</body>
+</html>
