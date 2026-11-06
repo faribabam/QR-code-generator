@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Pro — تولیدکننده پیشرفته</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#eef2f7; --card:#fff; --text:#0f172a; --muted:#64748b;
+  --border:#e2e8f0; --primary:#6366f1; --primary-2:#8b5cf6;
+  --danger:#ef4444; --success:#10b981; --radius:18px;
+  --shadow:0 10px 30px rgba(15,23,42,.08);
+}
+[data-theme="dark"]{
+  --bg:#0b1220; --card:#111a2e; --text:#e2e8f0; --muted:#94a3b8;
+  --border:#1e293b; --primary:#818cf8; --primary-2:#a78bfa;
+  --shadow:0 10px 30px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif}
+body{
+  min-height:100vh;background:var(--bg);color:var(--text);
+  transition:background .3s,color .3s;padding:20px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(99,102,241,.12),transparent 40%),
+                   radial-gradient(circle at 90% 90%,rgba(139,92,246,.12),transparent 40%);
+}
+.app{max-width:1050px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+h1{font-size:1.6rem;background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.hint{color:var(--muted);font-size:.85rem;margin-top:2px}
+.icon-btn{
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-size:1.2rem;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;display:grid;place-items:center;
+}
+.icon-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+main{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:900px){main{grid-template-columns:1.4fr 1fr;align-items:start}}
+.panel{background:var(--card);border-radius:var(--radius);padding:24px;
+  box-shadow:var(--shadow);border:1px solid var(--border);transition:background .3s}
+.panel h2{font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.panel h2 .badge{font-size:.7rem;padding:3px 8px;border-radius:99px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;font-weight:600}
+
+/* URL row */
+.url-row{display:flex;gap:8px;position:relative}
+.url-row input{
+  flex:1;padding:14px 46px 14px 16px;border:2px solid var(--border);border-radius:12px;
+  background:var(--bg);color:var(--text);font-size:1rem;outline:none;
+  direction:ltr;text-align:left;transition:border-color .2s,box-shadow .2s;
+}
+.url-row input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,.18)}
+.url-row .paste{
+  position:absolute;right:auto;left:8px;top:50%;transform:translateY(-50%);
+  background:transparent;border:none;font-size:1.1rem;cursor:pointer;color:var(--muted);
+  width:32px;height:32px;border-radius:8px;
+}
+.url-row .paste:hover{background:var(--bg);color:var(--primary)}
+.btn{
+  padding:14px 22px;border:none;border-radius:12px;font-size:.95rem;font-weight:600;
+  cursor:pointer;transition:transform .15s,box-shadow .2s,filter .2s;
+  color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(99,102,241,.35)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn.ghost:hover{background:var(--bg)}
+.btn.success{background:linear-gradient(135deg,#10b981,#059669)}
+.btn.danger{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.btn.sm{padding:8px 14px;font-size:.85rem;border-radius:10px}
+
+.error{color:var(--danger);font-size:.85rem;min-height:20px;margin:8px 0 4px;font-weight:500}
+
+/* Settings */
+details{
+  border:1px solid var(--border);border-radius:14px;margin:16px 0;overflow:hidden;
+  background:var(--bg);
+}
+details summary{
+  padding:14px 16px;cursor:pointer;font-weight:600;font-size:.9rem;
+  list-style:none;user-select:none;display:flex;justify-content:space-between;align-items:center;
+}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"▾";transition:transform .2s;color:var(--muted)}
+details[open] summary::after{transform:rotate(180deg)}
+.settings{padding:16px;display:grid;gap:14px;border-top:1px solid var(--border)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.grid-2{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.82rem;color:var(--muted);font-weight:500}
+.field input[type="color"]{
+  width:100%;height:42px;border:2px solid var(--border);border-radius:10px;
+  cursor:pointer;background:transparent;padding:2px;
+}
+.field input[type="range"]{
+  width:100%;accent-color:var(--primary);cursor:pointer;
+}
+.field select{
+  padding:10px 12px;border:2px solid var(--border);border-radius:10px;
+  background:var(--card);color:var(--text);font-size:.9rem;outline:none;
+}
+.field select:focus{border-color:var(--primary)}
+.field .val{color:var(--primary);font-weight:700}
+.toggle{display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;user-select:none}
+.toggle input{appearance:none;width:36px;height:20px;background:var(--border);border-radius:99px;
+  position:relative;cursor:pointer;transition:background .2s}
+.toggle input:checked{background:var(--primary)}
+.toggle input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;
+  border-radius:50%;background:#fff;transition:transform .2s}
+.toggle input:checked::after{transform:translateX(16px)}
+.upload{
+  border:2px dashed var(--border);border-radius:12px;padding:14px;text-align:center;
+  font-size:.85rem;color:var(--muted);cursor:pointer;transition:border-color .2s;
+}
+.upload:hover{border-color:var(--primary);color:var(--primary)}
+.upload input{display:none}
+.logo-preview{display:flex;align-items:center;gap:10px;margin-top:6px}
+.logo-preview img{width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
+
+/* Preview */
+.preview{
+  margin-top:16px;border-radius:16px;padding:22px;min-height:260px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#f8fafc,#eef2f7);position:relative;overflow:hidden;
+}
+[data-theme="dark"] .preview{background:linear-gradient(135deg,#0b1220,#111a2e)}
+.preview.transparent{
+  background-image:linear-gradient(45deg,#cbd5e1 25%,transparent 25%),
+                   linear-gradient(-45deg,#cbd5e1 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,#cbd5e1 75%),
+                   linear-gradient(-45deg,transparent 75%,#cbd5e1 75%);
+  background-size:20px 20px;
+  background-position:0 0,0 10px,10px -10px,-10px 0;
+}
+.preview canvas{max-width:100%;max-height:280px;height:auto;border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.placeholder{color:var(--muted);font-size:.9rem;text-align:center;line-height:1.7}
+.placeholder .big{font-size:2.2rem;display:block;margin-bottom:6px;opacity:.6}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);
+  border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Actions */
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-top:16px}
+.actions.hidden{display:none}
+
+/* History */
+.history-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
+.history-item{
+  display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;
+  background:var(--bg);border:1px solid var(--border);cursor:pointer;transition:border-color .2s;
+}
+.history-item:hover{border-color:var(--primary)}
+.history-item .icon{font-size:1.1rem;flex-shrink:0}
+.history-item .info{flex:1;min-width:0}
+.history-item .url{font-size:.85rem;direction:ltr;text-align:left;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.history-item .time{font-size:.7rem;color:var(--muted);margin-top:2px}
+.history-empty{text-align:center;color:var(--muted);font-size:.85rem;padding:20px 0}
+.history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+
+/* Toast */
+.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none}
+.toast{
+  padding:12px 20px;border-radius:12px;color:#fff;font-weight:600;font-size:.9rem;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  box-shadow:0 10px 30px rgba(0,0,0,.2);animation:slideUp .3s ease;
+  pointer-events:auto;max-width:90vw;
+}
+.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.toast.success{background:linear-gradient(135deg,#10b981,#059669)}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div>
+      <h1>QR Pro ✨</h1>
+      <div class="hint">تولیدکننده پیشرفته QR Code برای سایت‌ها</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" title="تغییر تم">🌙</button>
+  </header>
+
+  <main>
+    <!-- ستون اصلی -->
+    <section class="panel">
+      <div class="url-row">
+        <input type="url" id="url" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+        <button class="paste" id="paste" title="جای‌گذاری از کلیپ‌بورد">📋</button>
+        <button class="btn" id="generate">ساخت</button>
+      </div>
+      <div class="error" id="error"></div>
+
+      <details id="settings">
+        <summary>⚙️ تنظیمات پیشرفته</summary>
+        <div class="settings">
+          <div class="grid-2">
+            <div class="field">
+              <label>رنگ اصلی</label>
+              <input type="color" id="color1" value="#1e293b">
+            </div>
+            <div class="field">
+              <label>رنگ دوم (گرادیانت)</label>
+              <input type="color" id="color2" value="#6366f1">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <label class="toggle">
+              <input type="checkbox" id="gradient">
+              <span>فعال‌سازی گرادیانت</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="transparent">
+              <span>پس‌زمینه شفاف</span>
+            </label>
+          </div>
+
+          <div class="field">
+            <label>رنگ پس‌زمینه</label>
+            <input type="color" id="bg" value="#ffffff">
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label>سایز: <span class="val" id="size-val">512</span> px</label>
+              <input type="range" id="size" min="128" max="1024" step="32" value="512">
+            </div>
+            <div class="field">
+              <label>حاشیه: <span class="val" id="margin-val">4</span></label>
+              <input type="range" id="margin" min="0" max="10" step="1" value="4">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>سطح تصحیح خطا</label>
+            <select id="ec">
+              <option value="L">کم (7%)</option>
+              <option value="M">متوسط (15%)</option>
+              <option value="Q">بالا (25%)</option>
+              <option value="H" selected>خیلی بالا (30%)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>لوگو (اختیاری)</label>
+            <label class="upload" for="logo-file">
+              🖼️ برای انتخاب تصویر کلیک کنید
+              <input type="file" id="logo-file" accept="image/*">
+            </label>
+            <div class="logo-preview" id="logo-preview" hidden>
+              <img id="logo-img" alt="لوگو">
+              <button class="btn ghost sm" id="remove-logo">حذف لوگو</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div class="preview" id="preview">
+        <div class="placeholder">
+          <span class="big">📱</span>
+          آدرس سایت را وارد کنید و دکمه <b>ساخت</b> را بزنید
+        </div>
+      </div>
+
+      <div class="actions hidden" id="actions">
+        <button class="btn" data-act="png">⬇️ PNG</button>
+        <button class="btn" data-act="jpeg">⬇️ JPEG</button>
+        <button class="btn" data-act="svg">⬇️ SVG</button>
+        <button class="btn ghost" data-act="copy">📋 کپی</button>
+        <button class="btn ghost" data-act="share">🔗 اشتراک</button>
+        <button class="btn danger" data-act="reset">🔄 پاک کردن</button>
+      </div>
+    </section>
+
+    <!-- ستون کناری -->
+    <aside class="panel">
+      <div class="history-head">
+        <h2>🕘 تاریخچه</h2>
+        <button class="btn ghost sm" id="clear-history">پاک کردن</button>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </aside>
+  </main>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const state = { url: "", canvas: null, logo: null, history: [], renderSeq: 0 };
+const HISTORY_KEY = "qrpro_history_v1";
+const THEME_KEY   = "qrpro_theme_v1";
+
+/* ---------- Utilities ---------- */
+function showToast(msg, type = "") {
+  const c = $("toasts");
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => { el.style.opacity = "0"; el.style.transition = "opacity .3s"; }, 2200);
+  setTimeout(() => el.remove(), 2600);
+}
+function debounce(fn, ms) {
+  let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function sanitizeFilename(u) {
+  return u.replace(/^https?:\/\//, "").replace(/[^a-z0-9]/gi, "_").slice(0, 40) || "qr";
+}
+function formatTime(ts) {
+  const d = new Date(ts);
+  const pad = n => String(n).padStart(2, "0");
+  return `${pad(d.getHours())}:${pad(d.getMinutes())} — ${d.toLocaleDateString("fa-IR")}`;
+}
+
+/* ---------- Theme ---------- */
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const theme = saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(theme);
+}
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $("theme-toggle").textContent = t === "dark" ? "☀️" : "🌙";
+  localStorage.setItem(THEME_KEY, t);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+}
+
+/* ---------- URL ---------- */
+function normalizeUrl(raw) {
+  let u = raw.trim();
+  if (!u) return { error: "لطفاً آدرس سایت را وارد کنید." };
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  try {
+    const parsed = new URL(u);
+    if (parsed.protocol !== "https:") return { error: "فقط آدرس‌های https پذیرفته می‌شوند." };
+    if (!parsed.hostname.includes(".")) return { error: "آدرس وارد شده معتبر نیست." };
+    return { url: u };
+  } catch {
+    return { error: "آدرس وارد شده معتبر نیست." };
+  }
+}
+
+/* ---------- Logo ---------- */
+$("logo-file").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) { showToast("فقط فایل تصویری مجاز است", "error"); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast("حجم تصویر باید کمتر از ۲ مگابایت باشد", "error"); return; }
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      state.logo = img;
+      $("logo-img").src = r.result;
+      $("logo-preview").hidden = false;
+      $("ec").value = "H"; // EC بالا برای اطمینان با لوگو
+      showToast("لوگو اضافه شد ✅", "success");
+      scheduleRender();
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+});
+$("remove-logo").addEventListener("click", () => {
+  state.logo = null;
+  $("logo-file").value = "";
+  $("logo-preview").hidden = true;
+  scheduleRender();
+});
+
+/* ---------- Options ---------- */
+function readOptions() {
+  return {
+    size:       +$("size").value,
+    margin:     +$("margin").value,
+    ec:         $("ec").value,
+    color1:     $("color1").value,
+    color2:     $("color2").value,
+    bg:         $("bg").value,
+    gradient:   $("gradient").checked,
+    transparent:$("transparent").checked,
+    hasLogo:    !!state.logo
+  };
+}
+
+/* ---------- Core render ---------- */
+async function render() {
+  if (!state.url) return;
+  const myId = ++state.renderSeq;
+  const opts = readOptions();
+  const url = state.url;
+
+  // نمایش لودینگ
+  const preview = $("preview");
+  preview.classList.remove("transparent");
+  preview.innerHTML = `<div class="spinner"></div>`;
+
+  try {
+    // 1) ساخت ماسک QR (پس‌زمینه شفاف)
+    const maskCanvas = document.createElement("canvas");
+    await QRCode.toCanvas(maskCanvas, url, {
+      width: opts.size,
+      margin: opts.margin,
+      colorDark: "#000000",
+      colorLight: "#00000000",
+      errorCorrectionLevel: opts.ec
+    });
+    if (myId !== state.renderSeq) return;
+
+    // 2) بوم نهایی
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = opts.size;
+    const ctx = canvas.getContext("2d");
+
+    // 3) پس‌زمینه (اگر شفاف نباشد)
+    if (!opts.transparent) {
+      ctx.fillStyle = opts.bg;
+      ctx.fillRect(0, 0, opts.size, opts.size);
+    }
+
+    // 4) لایه رنگی با ماسک QR
+    const colorLayer = document.createElement("canvas");
+    colorLayer.width = colorLayer.height = opts.size;
+    const cctx = colorLayer.getContext("2d");
+
+    if (opts.gradient) {
+      const g = cctx.createLinearGradient(0, 0, opts.size, opts.size);
+      g.addColorStop(0, opts.color1);
+      g.addColorStop(1, opts.color2);
+      cctx.fillStyle = g;
+    } else {
+      cctx.fillStyle = opts.color1;
+    }
+    cctx.fillRect(0, 0, opts.size, opts.size);
+    cctx.globalCompositeOperation = "destination-in";
+    cctx.drawImage(maskCanvas, 0, 0);
+
+    ctx.drawImage(colorLayer, 0, 0);
+
+    // 5) لوگو
+    if (state.logo) {
+      const ls = opts.size * 0.20;
+      const x = (opts.size - ls) / 2;
+      const y = (opts.size - ls) / 2;
+      const pad = opts.size * 0.015;
+
+      // پس‌زمینه سفید گرد
+      ctx.fillStyle = opts.transparent ? "#ffffff" : opts.bg;
+      roundRect(ctx, x - pad, y - pad, ls + pad * 2, ls + pad * 2, opts.size * 0.02);
+      ctx.fill();
+
+      // خود لوگو
+      ctx.save();
+      roundRect(ctx, x, y, ls, ls, opts.size * 0.015);
+      ctx.clip();
+      ctx.drawImage(state.logo, x, y, ls, ls);
+      ctx.restore();
+    }
+
+    if (myId !== state.renderSeq) return;
+
+    state.canvas = canvas;
+
+    // 6) به‌روزرسانی پیش‌نمایش
+    preview.innerHTML = "";
+    if (opts.transparent) preview.classList.add("transparent");
+    const display = document.createElement("canvas");
+    display.width = display.height = opts.size;
+    display.getContext("2d").drawImage(canvas, 0, 0);
+    preview.appendChild(display);
+
+    $("actions").classList.remove("hidden");
+    $("error").textContent = "";
+  } catch (err) {
+    console.error(err);
+    if (myId === state.renderSeq) {
+      preview.innerHTML = `<div class="placeholder" style="color:var(--danger)">خطا در ساخت QR</div>`;
+      showToast("خطا در ساخت QR", "error");
+    }
+  }
+}
+const scheduleRender = debounce(() => { if (state.url) render(); }, 250);
+
+/* ---------- Actions ---------- */
+function downloadDataURL(dataURL, filename) {
+  const a = document.createElement("a");
+  a.href = dataURL; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+async function downloadPNG() {
+  if (!state.canvas) return;
+  downloadDataURL(state.canvas.toDataURL("image/png"), `qr-${sanitizeFilename(state.url)}.png`);
+  showToast("PNG دانلود شد ✅", "success");
+}
+
+async function downloadJPEG() {
+  if (!state.canvas) return;
+  // JPEG شفافیت ندارد → پس‌زمینه سفید
+  const c = document.createElement("canvas");
+  c.width = c.height = state.canvas.width;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.drawImage(state.canvas, 0, 0);
+  downloadDataURL(c.toDataURL("image/jpeg", 0.95), `qr-${sanitizeFilename(state.url)}.jpg`);
+  showToast("JPEG دانلود شد ✅", "success");
+}
+
+async function downloadSVG() {
+  if (!state.url) return;
+  const o = readOptions();
+  try {
+    let svg = await QRCode.toString(state.url, {
+      type: "svg",
+      margin: o.margin,
+      errorCorrectionLevel: o.ec,
+      color: { dark: o.color1, light: o.transparent ? "#00000000" : o.bg }
+    });
+    if (o.gradient) {
+      const defs = `<defs><linearGradient id="qrGrad" x1="0%" y1="0%" x2="100%" y2="100%">` +
+                   `<stop offset="0%" stop-color="${o.color1}"/>` +
+                   `<stop offset="100%" stop-color="${o.color2}"/></linearGradient></defs>`;
+      svg = svg.replace(/(<svg[^>]*>)/, `$1${defs}`);
+      svg = svg.split(`fill="${o.color1}"`).join(`fill="url(#qrGrad)"`);
+    }
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `qr-${sanitizeFilename(state.url)}.svg`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    showToast("SVG دانلود شد ✅ (بدون لوگو)", "success");
+  } catch (e) {
+    showToast("خطا در ساخت SVG", "error");
+  }
+}
+
+async function copyToClipboard() {
+  if (!state.canvas) return;
+  try {
+    const blob = await new Promise(r => state.canvas.toBlob(r, "image/png"));
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+    showToast("QR کپی شد ✅", "success");
+  } catch {
+    showToast("مرورگر از کپی تصویر پشتیبانی نمی‌کند", "error");
+  }
+}
+
+async function shareQR() {
+  if (!state.canvas) return;
+  try {
+    const blob = await new Promise(r => state.canvas.toBlob(r, "image/png"));
+    const file = new File([blob], `qr-${sanitizeFilename(state.url)}.png`, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "QR Code", text: state.url });
+    } else {
+      showToast("مرورگر از اشتراک‌گذاری فایل پشتیبانی نمی‌کند", "error");
+    }
+  } catch { /* کاربر لغو کرد */ }
+}
+
+function resetAll() {
+  state.url = ""; state.canvas = null;
+  $("url").value = "";
+  $("error").textContent = "";
+  $("preview").innerHTML = `<div class="placeholder"><span class="big">📱</span>آدرس سایت را وارد کنید و دکمه <b>ساخت</b> را بزنید</div>`;
+  $("preview").classList.remove("transparent");
+  $("actions").classList.add("hidden");
+  $("url").focus();
+}
+
+/* ---------- History ---------- */
+function loadHistory() {
+  try { state.history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+  catch { state.history = []; }
+  renderHistory();
+}
+function saveHistory() {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history)); }
+  catch { /* quota */ }
+}
+function addToHistory() {
+  if (!state.url) return;
+  const o = readOptions();
+  state.history = state.history.filter(h => h.url !== state.url);
+  state.history.unshift({
+    url: state.url,
+    ts: Date.now(),
+    options: { size: o.size, margin: o.margin, ec: o.ec, color1: o.color1, color2: o.color2,
+               bg: o.bg, gradient: o.gradient, transparent: o.transparent }
+  });
+  state.history = state.history.slice(0, 15);
+  saveHistory();
+  renderHistory();
+}
+function renderHistory() {
+  const list = $("history-list");
+  if (!state.history.length) {
+    list.innerHTML = `<div class="history-empty">هنوز QR ساخته نشده است</div>`;
+    return;
+  }
+  list.innerHTML = state.history.map((h, i) => `
+    <div class="history-item" data-idx="${i}">
+      <span class="icon">🔗</span>
+      <div class="info">
+        <div class="url">${h.url.replace(/</g, "&lt;")}</div>
+        <div class="time">${formatTime(h.ts)}</div>
+      </div>
+    </div>
+  `).join("");
+  list.querySelectorAll(".history-item").forEach(el => {
+    el.addEventListener("click", () => {
+      const h = state.history[+el.dataset.idx];
+      $("url").value = h.url;
+      Object.assign({}, h.options);
+      $("size").value = h.options.size;
+      $("margin").value = h.options.margin;
+      $("ec").value = h.options.ec;
+      $("color1").value = h.options.color1;
+      $("color2").value = h.options.color2;
+      $("bg").value = h.options.bg;
+      $("gradient").checked = h.options.gradient;
+      $("transparent").checked = h.options.transparent;
+      $("size-val").textContent = h.options.size;
+      $("margin-val").textContent = h.options.margin;
+      state.url = h.url;
+      render();
+    });
+  });
+}
+
+/* ---------- Events ---------- */
+$("theme-toggle").addEventListener("click", toggleTheme);
+$("generate").addEventListener("click", () => {
+  const r = normalizeUrl($("url").value);
+  if (r.error) { $("error").textContent = r.error; return; }
+  state.url = r.url;
+  $("error").textContent = "";
+  render().then(addToHistory);
+});
+$("url").addEventListener("keydown", e => {
+  if (e.key === "Enter") $("generate").click();
+});
+$("paste").addEventListener("click", async () => {
+  try {
+    const txt = await navigator.clipboard.readText();
+    $("url").value = txt.trim();
+    $("url").focus();
+  } catch { showToast("دسترسی به کلیپ‌بورد ممکن نیست", "error"); }
+});
+
+// تنظیمات → رندر مجدد
+["size", "margin"].forEach(id => {
+  $(id).addEventListener("input", () => {
+    $(id + "-val").textContent = $(id).value;
+    scheduleRender();
+  });
+});
+["color1", "color2", "bg", "ec"].forEach(id => {
+  $(id).addEventListener("input", scheduleRender);
+  $(id).addEventListener("change", scheduleRender);
+});
+["gradient", "transparent"].forEach(id => {
+  $(id).addEventListener("change", () => {
+    if (id === "transparent") $("bg").disabled = $("transparent").checked;
+    scheduleRender();
+  });
+});
+
+// دکمه‌های اکشن
+$("actions").addEventListener("click", e => {
+  const act = e.target.closest("[data-act]")?.dataset.act;
+  if (!act) return;
+  ({ png: downloadPNG, jpeg: downloadJPEG, svg: downloadSVG,
+     copy: copyToClipboard, share: shareQR, reset: resetAll })[act]?.();
+});
+
+// تاریخچه
+$("clear-history").addEventListener("click", () => {
+  if (!state.history.length) return;
+  if (confirm("تاریخچه پاک شود؟")) {
+    state.history = [];
+    saveHistory();
+    renderHistory();
+    showToast("تاریخچه پاک شد");
+  }
+});
+
+/* ---------- Init ---------- */
+initTheme();
+loadHistory();
+$("url").focus();
+</script>
+</body>
+</html>
